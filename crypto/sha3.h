@@ -20,7 +20,7 @@ typedef struct {
 #ifdef __AVR__
     uint8_t b[240];                         // state + work bytes
 #else
-	uint8_t b[200];							// has big registers
+    uint8_t b[200];                         // has big registers
 #endif
     uint8_t pt, rsiz, mdlen;                // these don't overflow
 } sha3_ctx_t;
