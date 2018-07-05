@@ -8,8 +8,8 @@ int test_aes_siv();
 
 int main(int argc, char **argv)
 {
-    printf("test_aes256() = %d\n", test_aes256());
-    printf("test_aes_siv() = %d\n", test_aes_siv());
+	printf("test_aes256() = %d\n", test_aes256());
+	printf("test_aes_siv() = %d\n", test_aes_siv());
 
 	printf("test_sha3() = %d\n", test_sha3());
 	printf("test_shake() = %d\n", test_shake());
