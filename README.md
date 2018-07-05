@@ -91,7 +91,7 @@ On second:
 !!! Subscribed to /hello
 
 ```
-Now, if you enter a line of text (without `!`), it will be broadcat on the
+Now, if you enter a line of text (without `!`), it will be broadcast on the
 topic `/hello` without encryption, as encryption keys are not set:
 ```
 Hello, World!
@@ -101,7 +101,7 @@ Hello, World!
 000 Hello, World!      48 65 6C 6C 6F 2C 20 57 6F 72 6C 64 21
 ```
 The fist debug line indicates a sent message (`>>>`), and error 105,
-TopicKeyMissing. Both clients recevie the message (`<<<`) with error 104,
+TopicKeyMissing. Both clients receive the message (`<<<`) with error 104,
 indicating that the message is too short to be encrypted.
 
 ### Setting Topic Keys
@@ -138,7 +138,7 @@ topic (set via `!t` or `!s`).
 060 ...g.S..q..B..Y#   A5 06 F2 67 DD 53 D9 08 71 D7 E2 42 E1 B8 59 23
 070 .....1...          C8 FA D0 BF BB 31 B8 05 CF
 ```
-We may now broadcast and reveive encrypted messages:
+We may now broadcast and receive encrypted messages:
 ```
 hello
 >>> (ok) /hello:
