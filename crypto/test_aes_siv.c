@@ -47,10 +47,13 @@ int test_aes256()
     return 0;
 }
 
+#include <stdio.h>
+
 // An AES256-SIV Test vector
 
 int test_aes_siv()
 {
+	// self generated
     const uint8_t test_key[64] = {
         0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
         0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
@@ -80,9 +83,21 @@ int test_aes_siv()
         0xFF, 0xAA, 0xDF, 0x4F, 0xB0, 0x49
     };
 
-    uint8_t buf1[32], buf2[32];
+	// from crypto_test.go
+	const uint8_t test_jp[80] = {
+		163, 170, 113, 22,  250, 77,  249, 210, 78,  28,
+		160, 45,  237, 93,  164, 200, 239, 32,  170, 161,
+		67,  210, 209, 143, 206, 227, 56,  153, 89,  63,
+		105, 243, 212, 68,  150, 83,  214, 188, 67,  40,
+		124, 247, 11,  3,   36,  146, 111, 176, 104, 213,
+		152, 36,  136, 233, 234, 238, 103, 167, 49,  182,
+		211, 77,  82,  130, 240, 196, 174, 235, 101, 183,
+		104, 189, 60,  240, 96,  15,  71, 147,  9,   43
+	};
+
+    uint8_t buf1[256], buf2[256];
     size_t len1, len2;
-    int fails;
+    int i, fails;
 
     memset(buf1, 0x55, sizeof(buf1));
     len1 = 0;
@@ -93,21 +108,36 @@ int test_aes_siv()
 
     // encrypt test
     aes256_encrypt_siv(buf1, &len1, test_ad, 24, test_pt, 14, test_key);
-    if (len1 != 30 || memcmp(buf1, test_ivc, len1) != 0)
+    if (len1 != 30 || memcmp(buf1, test_ivc, len1) != 0) {
         fails++;
+	}
 
     // decrypt test
     if (aes256_decrypt_siv(buf2, &len2, test_ad, 24,
-                            buf1, len1, test_key))
+                            buf1, len1, test_key)) {
         fails++;
-    if (len2 != 14 || memcmp(buf2, test_pt, len2) != 0)
+	}
+
+    if (len2 != 14 || memcmp(buf2, test_pt, len2) != 0) {
         fails++;
+	}
 
     // corrupt test
     buf1[25] ^= 1;
     if (aes256_decrypt_siv(buf2, &len2, test_ad, 24,
-                            buf1, len1, test_key) == 0)
+                            buf1, len1, test_key) == 0) {
         fails++;
+	}
+
+	// encrypt test with JP's test vector
+	for (i = 0; i < sizeof(buf1); i++)
+		buf1[i] = i;
+	len2 = 0;
+	aes256_encrypt_siv(buf2, &len2, buf1, 8, buf1, 64, buf1);
+
+	if (len2 != 80 || memcmp(buf2, test_jp, 80) != 0) {
+		fails++;
+	}
 
     return fails;
 }
