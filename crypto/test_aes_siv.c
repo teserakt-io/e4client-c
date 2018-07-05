@@ -132,6 +132,7 @@ int test_aes_siv()
     // encrypt test with JP's test vector
     for (i = 0; i < sizeof(buf1); i++)
         buf1[i] = i;
+
     len2 = 0;
     aes256_encrypt_siv(buf2, &len2, buf1, 8, buf1, 64, buf1);
 
