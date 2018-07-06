@@ -14,7 +14,7 @@
 #include "MQTTClient.h"
 
 #include "e4client.h"
-#include "e4persistent.h"
+#include "e4c_store.h"
 #include "sha3.h"
 
 #define CLIC_QOS    0

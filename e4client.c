@@ -9,7 +9,7 @@
 #endif
 
 #include "e4client.h"
-#include "e4persistent.h"
+#include "e4c_store.h"
 
 #include "sha3.h"
 #include "aes_siv.h"

@@ -1,30 +1,27 @@
-//  e4cersistent.c
+//  e4c_store_file.c
 //  2018-07-06  Markku-Juhani O. Saarinen <markku@teserakt.io>
 
 //  (c) 2018 Copyright Teserakt AG
 
-//  Persistent key storage.
+//  Persistent key storage for POSIX devices. Really a toy version
+//  intended for little embedded devices.
 
-#include <string.h>
-
-#ifdef __AVR__
-#define E4C_TOPICS_MAX 5
-#else
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
-
-#define E4C_TOPICS_MAX 100
-#endif
+#include <string.h>
 
 #include "e4client.h"
-#include "e4persistent.h"
+#include "e4c_store.h"
 #include "sha3.h"
 
 // number of topic keys
+
+#define E4C_TOPICS_MAX 100
+
 static int topic_keys_no = 0;
 
 // This is the topic-key structure
@@ -35,6 +32,8 @@ typedef struct {
 } topic_key_t;
 
 static topic_key_t topic_keys[E4C_TOPICS_MAX];
+
+// Filename of the persistence file
 
 static char *persistence_file = NULL;
 
@@ -208,8 +207,6 @@ int e4c_set_topic_key(const uint8_t *topic_hash, const uint8_t *key)
     return e4c_sync();
 }
 
-#ifndef __AVR__
-
 void e4c_debug_dumpkeys()
 {
     int i, j;
@@ -224,6 +221,3 @@ void e4c_debug_dumpkeys()
         printf("\n");
     }
 }
-
-#endif
-
