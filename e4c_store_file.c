@@ -62,7 +62,7 @@ int e4c_init(const char *path)
 
     close(fd);
 
-    return 0;
+    return topic_keys_no;
 }
 
 // Synchronize the persistent file, just overwriting to it

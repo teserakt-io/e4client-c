@@ -13,6 +13,7 @@
 
 // Initialize and check if persistent storage is valid. The path is 
 // optional -- default filename is used if set to NULL. Ignored with EEPROM.
+// REturns the number of topic keys obtained from persistence.
 
 int e4c_init(const char *path);
 
