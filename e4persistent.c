@@ -11,7 +11,12 @@
 #define E4C_TOPICS_MAX 5
 #else
 #include <stdio.h>
-#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
+
 #define E4C_TOPICS_MAX 100
 #endif
 
@@ -29,22 +34,70 @@ typedef struct {
     uint8_t key[E4C_KEY_LEN];
 } topic_key_t;
 
-topic_key_t topic_keys[E4C_TOPICS_MAX];
+static topic_key_t topic_keys[E4C_TOPICS_MAX];
 
+static char *persistence_file = NULL;
 
 // Initialize and check if persistent storage is valid. The path is 
 // optional -- default filename is used if set to NULL. Ignored with EEPROM.
 
 int e4c_init(const char *path)
 {
+    int fd;
+
     topic_keys_no = 0;
+
+    if (path == NULL)
+        path = "/tmp/persistence.e4p";
+
+    persistence_file = strdup(path);
+
+    fd = open(path, O_RDONLY);
+    if (fd < 0) {
+        perror(path);
+        return E4ERR_PersistenceError;
+    }
+
+    topic_keys_no = read(fd, topic_keys, sizeof(topic_keys)) / 
+        sizeof(topic_key_t);
+
+    close(fd);
+
+    return 0;
+}
+
+// Synchronize the persistent file, just overwriting to it
+
+int e4c_sync()
+{
+    int fd;
+    size_t siz;
+
+    if (persistence_file == NULL)
+        return E4ERR_PersistenceError;
+
+    fd = open(persistence_file, O_WRONLY | O_CREAT, 0600);
+    if (fd < 0) {
+        perror(persistence_file);
+        return E4ERR_PersistenceError;
+    }
+
+    siz = topic_keys_no * sizeof(topic_key_t);
+    if (write(fd, topic_keys, siz) != siz)
+        perror(persistence_file);
+
     return 0;
 }
 
 // Free all resources
 
 int e4c_free()
-{
+{   
+    if (persistence_file != NULL) {
+        e4c_sync();
+        free(persistence_file);
+        persistence_file = NULL;
+    }
     return 0;
 }
 
@@ -97,7 +150,8 @@ int e4c_remove_topic(const uint8_t *topic_hash)
                     sizeof(topic_key_t));
             }
             topic_keys_no--;
-            return 0;
+
+            return e4c_sync();
         }
     }
 
@@ -108,11 +162,10 @@ int e4c_remove_topic(const uint8_t *topic_hash)
 
 int e4c_reset_topics()
 {
-    if (topic_keys_no < 1)
-        return E4ERR_TopicKeyMissing;
-    topic_keys_no = 1;
+    if (topic_keys_no > 1)
+        topic_keys_no = 1;
 
-    return 0;
+    return e4c_sync();
 }
 
 // set id key for this instance index 0
@@ -129,7 +182,7 @@ int e4c_set_id_key(const uint8_t *cmd_topic_hash, const uint8_t *key)
             topic_keys_no = 1;
     }
 
-    return 0;
+    return e4c_sync();
 }
 
 // set key for given topic (hash)
@@ -152,7 +205,7 @@ int e4c_set_topic_key(const uint8_t *topic_hash, const uint8_t *key)
         topic_keys_no++;
     }
 
-    return 0;
+    return e4c_sync();
 }
 
 #ifndef __AVR__

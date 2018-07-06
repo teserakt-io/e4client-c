@@ -18,6 +18,7 @@
 #define E4ERR_TopicKeyMissing       -105
 #define E4ERR_ReplayedMessage       -106
 #define E4ERR_InvalidCommand        -107
+#define E4ERR_PersistenceError      -108
 
 // Size of the topic hash
 #define E4C_TOPIC_LEN 32

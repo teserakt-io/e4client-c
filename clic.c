@@ -143,8 +143,7 @@ int msg_recvd(void *context, char *topicName,
     return 1;
 }
 
-// generate an increasing sequence with time-dependant start byte
-
+// e4clic main()
 
 #define MAX_PARAM 16
 
@@ -189,11 +188,21 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    // set the command topic and zeroize key 
+    // set up persistence
+    snprintf(line, sizeof(line), "%s.e4p", clientid);
+    e4c_init(line);
+    printf("!!! Persistence file set to %s\n", line);
+
+    // set the command topic and zeroize key if not defined
     snprintf(cmdtopic, sizeof(cmdtopic), "e4/%s", clientid);
-    memset(key, 0, E4C_KEY_LEN);
-    sha3(cmdtopic, strlen(cmdtopic), hash, E4C_TOPIC_LEN);
-    e4c_set_id_key(hash, key);
+    if (e4c_getindex(cmdtopic) < 0) {
+        memset(key, 0, E4C_KEY_LEN);
+        sha3(cmdtopic, strlen(cmdtopic), hash, E4C_TOPIC_LEN);
+        e4c_set_id_key(hash, key);
+        printf("!!! key for %s zeroized\n", cmdtopic);
+    } else {
+        printf("!!! key for %s loaded\n", cmdtopic);
+    }
 
     // subscribe to what ever is the zero key
     MQTTClient_subscribe(client, cmdtopic , CLIC_QOS);
@@ -387,6 +396,9 @@ int main(int argc, char* argv[])
                     line[0], clic_usage);
         }
     };
+
+    e4c_free();
+
     printf("!!! Disconnecting.\n");
 
     MQTTClient_disconnect(client, 10000);
