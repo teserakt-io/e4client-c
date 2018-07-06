@@ -4,6 +4,7 @@
 BIN		= e4clic
 OBJS		= clic.o 			\
 		e4client.o			\
+		e4persistent.o			\
 		crypto/aes_siv.o		\
 		crypto/aes256enc_openssl.o	\
 		crypto/sha3.o			\
