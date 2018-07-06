@@ -82,8 +82,12 @@ int e4c_sync()
     }
 
     siz = topic_keys_no * sizeof(topic_key_t);
-    if (write(fd, topic_keys, siz) != siz)
+    if (write(fd, topic_keys, siz) != siz) {
         perror(persistence_file);
+        close(fd);
+        return E4ERR_PersistenceError;
+    }
+    close(fd);
 
     return 0;
 }
