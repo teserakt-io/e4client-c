@@ -44,8 +44,14 @@ for this particular host.
 $ ./e4clic tcp://test.mosquitto.org:1883 Alice
 !!! broker = tcp://test.mosquitto.org:1883
 !!! my client id = Alice
+Alice.e4p: No such file or directory
+!!! Persistence file set to Alice.e4p
+!!! key for e4/Alice zeroized
 !!! command topic = e4/Alice
 ```
+Note that a persistence file `Alice.e4p` is created in current directory. 
+This contains all keys that the "Alice" client knows and will be loaded
+in subsequent invocations unless you delete it.
 The test client has a bunch of single-letter commands prefixed with
 exclamation mark (`!`):
 ```
@@ -71,21 +77,27 @@ We will illustrate basic usage logic of e4clic with these examples.
 ### Exchanging messages
 
 Let's establish two clients, "Alice" and "Bob" and subscribe them to topic 
-`/hello`. On first terminal window:
+`/hello` with `!s` command:
 
 ```
 $ ./e4clic tcp://test.mosquitto.org:1883 Alice
 !!! broker = tcp://test.mosquitto.org:1883
 !!! my client id = Alice
+Alice.e4p: No such file or directory
+!!! Persistence file set to Alice.e4p
+!!! key for e4/Alice zeroized
 !!! command topic = e4/Alice
 !s /hello
 !!! Subscribed to /hello
 ```
-On second:
+On second window
 ```
 ./e4clic tcp://test.mosquitto.org:1883 Bob
 !!! broker = tcp://test.mosquitto.org:1883
 !!! my client id = Bob
+Bob.e4p: No such file or directory
+!!! Persistence file set to Bob.e4p
+!!! key for e4/Bob zeroized
 !!! command topic = e4/Bob
 !s /hello
 !!! Subscribed to /hello
@@ -95,9 +107,9 @@ Now, if you enter a line of text (without `!`), it will be broadcast on the
 topic `/hello` without encryption, as encryption keys are not set:
 ```
 Hello, World!
->>> (!105) /hello:
+>>> (!-105) /hello:
 000 Hello, World!      48 65 6C 6C 6F 2C 20 57 6F 72 6C 64 21
-<<< (!104) /hello:
+<<< (!-104) /hello:
 000 Hello, World!      48 65 6C 6C 6F 2C 20 57 6F 72 6C 64 21
 ```
 The fist debug line indicates a sent message (`>>>`), and error 105,
