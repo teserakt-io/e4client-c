@@ -92,6 +92,16 @@ int e4c_sync()
     return 0;
 }
 
+// This is the persistent storage format -- invoked with a physical button
+// or something
+
+int reset_storage()
+{
+    topic_keys_no = 0;
+
+    return e4c_sync();
+}
+
 // Free all resources
 
 int e4c_free()
