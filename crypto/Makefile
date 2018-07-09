@@ -5,11 +5,12 @@ DIST		= crypto
 BIN		= xtest
 OBJS		= main.o	test_sha3.o	test_aes_siv.o	\
 		sha3.o		keccakf1600.o			\
-		aes_siv.o	aes256enc_openssl.o		\
+		aes_siv.o	aes256enc_ref.o
+
 
 CC		= gcc
 CFLAGS		= -Wall -Ofast -march=native
-LIBS		= -lcrypto
+LIBS		=
 LDFLAGS		=
 INCLUDES	=
 
