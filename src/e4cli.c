@@ -18,6 +18,10 @@
 #define E4_STORE_FILE
 #include "e4/e4.h"
 
+/* local header includes */
+#include "e4cli.h"
+#include "mqtt.h"
+
 const char cli_commands[] = "
 The following commands can be used:
 
@@ -34,6 +38,65 @@ The following commands can be used:
     !z, !zero state
     !q, !quit
 ";
+
+void client_setid(const char* arg) {
+    
+}
+
+void client_setkey(const char* arg) {
+
+}
+
+void client_genkey(const char* arg) {
+    
+}
+
+void client_settopickey(const char* arg) {
+    
+}
+
+void client_subscribe(const char* arg) {
+    
+    size_t arglen = strlen(arg);
+    if ( arglen == 0 )
+    {
+        printf("client_subscribe: Invalid topic")
+        return;
+    }
+
+    MQTTClient_subscribe(...)
+}
+
+void client_unsubscribe(const char* arg) {
+    size_t arglen = strlen(arg);
+    if ( arglen == 0 )
+    {
+        printf("client_subscribe: Invalid topic")
+        return;
+    }
+
+    MQTTClient_unsubscribe(...)
+}
+
+void client_changetopic(const char* arg) {
+    
+}
+
+void client_e4msg(const char* arg) {
+    
+}
+
+void client_clearmsg(const char* arg) {
+    
+}
+
+void client_list(const char* arg) {
+    
+}
+
+void client_zero(const char* arg) {
+    
+}
 
 void repl() {
 
@@ -86,15 +149,56 @@ void repl() {
             continue
         }
 
-        if (strcmp(commmand, "")
+        if (strcmp(commmand, "setid") == 0) { 
+            client_setid(arg);
+        } else if (strcmp(command, "setkey") == 0) {
+            client_setkey(arg);
+        } else if (strcmp(command, "genkey") == 0) {
+            client_genkey(arg);
+        } else if (strcmp(command, "settopickey") == 0) {
+            client_settopickey(arg);
+        } else if (strcmp(command, "subscribe") == 0 || 
+                   strcmp(command, "s") == 0) {
+            client_subscribe(arg);
+        } else if (strcmp(command, "unsubscribe") == 0 || 
+                   strcmp(command, "u") == 0) {
+            client_unsubscribe(arg);
+        } else if (strcmp(command, "changetopic") == 0 || 
+                   strcmp(command, "u") == 0) {
+            client_changetopic(arg);
+        } else if (strcmp(command, "e4msg") == 0 || 
+                   strcmp(command, "e") == 0) {
+            client_e4msg(arg);
+        } else if (strcmp(command, "clearmsg") == 0 || 
+                   strcmp(command, "m") == 0) {
+            client_clearmsg(arg);
+        } else if (strcmp(command, "list") == 0 || 
+                   strcmp(command, "l") == 0) {
+            client_list(arg);
+        } else if (strcmp(command, "zero") == 0 || 
+                   strcmp(command, "z") == 0) {
+            client_zero(arg);
+        } else if (strcmp(command, "quit") == 0 || 
+                   strcmp(command, "q") == 0) {
+            break
+        } else
+        {
+            printf("Unrecognized command %s\n", command);
+        }
+        
 
     }
 }
 
-void init() {
+const char version[] = "E4CLI E4 Command Line Client in C (c) Teserakt AG 2018, 2019.\n
+https://www.teserakt.io/\n"
+
+
+void argparse(int argc, char** argv) {
 
 }
 
 int main(int argc, char** argv) {
 
+    MQTTClient mqttClient;
 }
