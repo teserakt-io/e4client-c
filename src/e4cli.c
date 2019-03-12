@@ -190,15 +190,166 @@ void repl() {
     }
 }
 
+
 const char version[] = "E4CLI E4 Command Line Client in C (c) Teserakt AG 2018, 2019.\n
 https://www.teserakt.io/\n"
 
 
-void argparse(int argc, char** argv) {
+
+int argparse(char* filestore, const size_t fslen, 
+              char* broker, const size_t brokerlen,
+              char* clientid,  const size_t clidlen, 
+              int* help, int argc, char** argv) {
+
+
+    int validargs = 0;
+    int i = 1, j = 0;
+    while ( i < argc ) {
+        int step=1;
+
+        char *arg = argv[i];
+        size_t arglen = strlen(arg);
+        
+        if ( arglen >= 2 && strncmp(arg, "-", 1) == 0 ) {
+            
+            // TODO: there is almost certainly a better way of doing this
+            // however we must be careful not to have any dependency on 
+            // libraries we cannot easily run on devices.
+            char* argname = NULL;
+            char argletter = arg[2];
+            if ( argletter == '-' ) {
+                char* argname = &arg[2];
+            }
+
+            if ( argletter == 'f' || strncmp(argname, "filestore", 9) == 0 ) {
+                if ( i+1 < argc ) {
+                    size_t pathlen = 0;
+                    size_t bytesparsed = 0;
+                    step += 1;
+                    path = argv[i+1];
+                    pathlen = strlen(path);
+
+                    bytesparsed = strlcpy(filestore, path, fslen);
+                    if ( bytesparsed >= fslen ) {
+                        printf("filestore: invalid parameter");
+                        validargs = 1;
+                        break;
+                    }
+                }
+                else {
+                    printf("filestore: no filename specified");
+                    validargs = 1;
+                    break;
+                }
+            } 
+            else if ( argletter == 'i' || strncmp(argname, "clientid", 8) == 0 ) 
+            {
+                if ( i+1 < argc ) {
+                    size_t pathlen = 0;
+                    size_t bytesparsed = 0;
+                    step += 1;
+                    client = argv[i+1];
+                    clientlen = strlen(path);
+
+                    bytesparsed = strlcpy(clientid, clientid, clidlen);
+                    if ( bytesparsed >= clidlen ) {
+                        printf("clientid: invalid parameter");
+                        validargs = 1;
+                        break;
+                    }
+                }
+                else {
+                    printf("clientid: no filename specified");
+                    validargs = 1;
+                    break;
+                }
+            } 
+            else if ( argletter == 'b' || strncmp(argname, "broker", 8) == 0 ) 
+            {
+                if ( i+1 < argc ) {
+                    size_t pathlen = 0;
+                    size_t bytesparsed = 0;
+                    step += 1;
+                    brokerp = argv[i+1];
+                    brokerplen = strlen(path);
+
+                    bytesparsed = strlcpy(broker, brokerp, brokerplen);
+                    if ( bytesparsed >= brokerplen ) {
+                        printf("broker: invalid parameter");
+                        validargs = 1;
+                        break;
+                    }
+                }
+                else {
+                    printf("broker: no filename specified");
+                    validargs = 1;
+                    break;
+                }
+            }
+            else {
+                printf("argparse: unknown argument %s\n", arg);
+                validargs = 1;
+                break;
+            }
+            else if ( argletter == 'h' || strncmp(argname, "help", 4) == 0) {
+                *help = 1;
+            }
+            
+        } 
+        else
+        {
+            printf("Unknown argument: %s\n", arg);
+            validargs = 1;
+            break;
+        }
+        
+
+        i += step;
+    }
+}
+
+void printhelp() {
 
 }
 
 int main(int argc, char** argv) {
 
     MQTTClient mqttClient;
+    char filestore[256];
+    char clientid[256];
+    char broker[256];
+    char e4cmdtopic[256];
+    int helpflag = 0;
+
+    memset(filestore, 0, sizeof(filestore));
+    memset(clientid, 0, sizeof(clientid));
+    memset(broker, 0, sizeof(broker));
+
+    if ( argparse(filestore, sizeof(filestore), 
+                  clientid, sizeof(clientid),
+                  &helpflag, argc, argv) != 0 ) {
+        printf("Invalid command line arguments, exiting.\n");
+        return 1;
+    }
+
+    if ( helpflag ) {
+        printhelp();
+        return 0;
+    }
+
+    if ( strlen(clientid) == 0 || strlen(broker) == 0 ) {
+        printf("Client ID/broker not set, pass 
+    -clientid <clientid>
+    -broker <broker>
+
+See --help for more info.");
+        return 2;
+    }
+
+    /* from here, we are NOT running in help mode and do have a clientid 
+     * and broker, albeit possibly not valid */
+
+    
+    
+    return 0;
 }
