@@ -22,28 +22,44 @@
 #include "e4cli.h"
 #include "mqtt.h"
 
+/*
 const char cli_commands[] = "
+e4cli (c) 2018-2019 Teserakt AG, All Rights Reserved.
+
+E4CLI takes the following commands 
+
 The following commands can be used:
 
-    !setid
-    !setkey
-    !genkey
-    !settopickey
-    !s, !subscribe
-    !u, !unsubscribe
-    !c, !changetopic
-    !e, !e4msg
-    !m, !clearmsg
-    !l, !list state
-    !z, !zero state
+    !setid                      - set the device ID
+    !setkey <hex>               - set the device key (raw, use hex)
+    !setpwd <pwd>               - set the device password (derives key)
+    !genkey                     - generate key
+    !settopickey <hex>          - sets a topic key 
+    !s, !subscribe <topic>      - subscribe to topic
+    !u, !unsubscribe <topic>    - unsubscribe from topic 
+    !c, !changetopic <topic>    - set output filter to a given topic
+    !e, !e4msg <topic> <msg>    - send E4 protected message msg on topic
+    !m, !clearmsg <topic> <msg> - send clear messgae msg on topic
+    !l, !list
+    !z, !zero
     !q, !quit
 ";
+*/
+
+void printhelp() {
+    printf("%s\n", cli_commands);
+}
 
 void client_setid(const char* arg) {
-    
+    /* IDs do not support spaces */
+
 }
 
 void client_setkey(const char* arg) {
+
+}
+
+void client_setpwd(const char* arg) {
 
 }
 
@@ -64,7 +80,7 @@ void client_subscribe(const char* arg) {
         return;
     }
 
-    MQTTClient_subscribe(...)
+    MQTTClient_subscribe(handle, arg, 0);
 }
 
 void client_unsubscribe(const char* arg) {
@@ -75,7 +91,7 @@ void client_unsubscribe(const char* arg) {
         return;
     }
 
-    MQTTClient_unsubscribe(...)
+    MQTTClient_unsubscribe(handle, arg);
 }
 
 void client_changetopic(const char* arg) {
@@ -109,7 +125,6 @@ void repl() {
         char* arg = NULL;
 
         int linelen = strlen(line);
-        
 
         // user pressed enter/entered nothing except a newline.
         if (linelen == 1 ) {
@@ -123,7 +138,7 @@ void repl() {
 
         if (line[0] != '!')
         {
-            // TODO: what do we do here?
+            printf("Unrecognized command, try !help\n")
             continue;
         }
 
@@ -141,7 +156,6 @@ void repl() {
                 }
                 break
             }
-            
         }
 
         if ( command == NULL ) {
@@ -153,6 +167,8 @@ void repl() {
             client_setid(arg);
         } else if (strcmp(command, "setkey") == 0) {
             client_setkey(arg);
+        } else if (strcmp(command, "setpwd") == 0) {
+            client_setpwd(arg);
         } else if (strcmp(command, "genkey") == 0) {
             client_genkey(arg);
         } else if (strcmp(command, "settopickey") == 0) {
@@ -178,9 +194,11 @@ void repl() {
         } else if (strcmp(command, "zero") == 0 || 
                    strcmp(command, "z") == 0) {
             client_zero(arg);
+        } else if (strcmp(command, "help") == 0 || 
+                   strcmp(command, "h") == 0) {
         } else if (strcmp(command, "quit") == 0 || 
                    strcmp(command, "q") == 0) {
-            break
+            break;
         } else
         {
             printf("Unrecognized command %s\n", command);
@@ -308,9 +326,7 @@ int argparse(char* filestore, const size_t fslen,
     }
 }
 
-void printhelp() {
 
-}
 
 int main(int argc, char** argv) {
 

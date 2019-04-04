@@ -8,5 +8,6 @@ cd build
 cmake -DPAHO_BUILD_STATIC=TRUE ..
 make
 cd ../..
-ln -s paho.mqtt.c/build/src/libpaho-mqtt3c-static.a libpaho-mqtt3c.a
+mkdir -p lib
+cp -vf paho.mqtt.c/build/src/libpaho-mqtt3c-static.a lib/libpaho-mqtt3c.a
 
