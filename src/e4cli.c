@@ -17,34 +17,37 @@
 /* Use the file storage command */
 #define E4_STORE_FILE
 #include "e4/e4.h"
+#include "e4/strlcpy.h"
 
 /* local header includes */
 #include "e4cli.h"
 #include "mqtt.h"
 
-/*
-const char cli_commands[] = "
-e4cli (c) 2018-2019 Teserakt AG, All Rights Reserved.
+const char cli_commands[] = "e4cli (c) 2018-2019 Teserakt AG, All Rights Reserved."
+" "
+"E4CLI takes the following commands"
+" "
+"The following commands can be used:"
+" "
+"    !setid                      - set the device ID"
+"    !setkey <hex>               - set the device key (raw, use hex)"
+"    !setpwd <pwd>               - set the device password (derives key)"
+"    !genkey                     - generate key"
+"    !settopickey <hex>          - sets a topic key"
+"    !s, !subscribe <topic>      - subscribe to topic"
+"    !u, !unsubscribe <topic>    - unsubscribe from topic"
+"    !c, !changetopic <topic>    - set output filter to a given topic"
+"    !e, !e4msg <topic> <msg>    - send E4 protected message msg on topic"
+"    !m, !clearmsg <topic> <msg> - send clear messgae msg on topic"
+"    !l, !list"
+"    !z, !zero"
+"    !q, !quit"
+"";
 
-E4CLI takes the following commands 
+const char version[] = "E4CLI E4 Command Line Client C Version X.Y.Z (...)"
+"Copyright (c) 2018-2019 Teserakt AG, Switzerland. https://www.teserakt.io/"
+"";
 
-The following commands can be used:
-
-    !setid                      - set the device ID
-    !setkey <hex>               - set the device key (raw, use hex)
-    !setpwd <pwd>               - set the device password (derives key)
-    !genkey                     - generate key
-    !settopickey <hex>          - sets a topic key 
-    !s, !subscribe <topic>      - subscribe to topic
-    !u, !unsubscribe <topic>    - unsubscribe from topic 
-    !c, !changetopic <topic>    - set output filter to a given topic
-    !e, !e4msg <topic> <msg>    - send E4 protected message msg on topic
-    !m, !clearmsg <topic> <msg> - send clear messgae msg on topic
-    !l, !list
-    !z, !zero
-    !q, !quit
-";
-*/
 
 void printhelp() {
     printf("%s\n", cli_commands);
@@ -76,7 +79,7 @@ void client_subscribe(const char* arg) {
     size_t arglen = strlen(arg);
     if ( arglen == 0 )
     {
-        printf("client_subscribe: Invalid topic")
+        printf("client_subscribe: Invalid topic");
         return;
     }
 
@@ -87,7 +90,7 @@ void client_unsubscribe(const char* arg) {
     size_t arglen = strlen(arg);
     if ( arglen == 0 )
     {
-        printf("client_subscribe: Invalid topic")
+        printf("client_subscribe: Invalid topic");
         return;
     }
 
@@ -132,13 +135,13 @@ void repl() {
         }
 
         // remove trailing new line from fgets()
-        if (linelen >= 1 && line[l-1] == '\n') {
+        if (linelen >= 1 && line[linelen-1] == '\n') {
             line[--linelen] = 0;
         }
 
         if (line[0] != '!')
         {
-            printf("Unrecognized command, try !help\n")
+            printf("Unrecognized command, try !help\n");
             continue;
         }
 
@@ -152,18 +155,18 @@ void repl() {
                 command = &line[1];
                 // don't assign if i = linelen-1; potential buffer overflow.
                 if ( i+1 < linelen ) {
-                    arg = &line[i+];
+                    arg = &line[i+1];
                 }
-                break
+                break;
             }
         }
 
         if ( command == NULL ) {
             // error, let's do something about it?
-            continue
+            continue;
         }
 
-        if (strcmp(commmand, "setid") == 0) { 
+        if (strcmp(command, "setid") == 0) { 
             client_setid(arg);
         } else if (strcmp(command, "setkey") == 0) {
             client_setkey(arg);
@@ -209,8 +212,7 @@ void repl() {
 }
 
 
-const char version[] = "E4CLI E4 Command Line Client in C (c) Teserakt AG 2018, 2019.\n
-https://www.teserakt.io/\n"
+
 
 
 
@@ -234,21 +236,22 @@ int argparse(char* filestore, const size_t fslen,
             // however we must be careful not to have any dependency on 
             // libraries we cannot easily run on devices.
             char* argname = NULL;
-            char argletter = arg[2];
+            char argletter = arg[1];
             if ( argletter == '-' ) {
-                char* argname = &arg[2];
+                argname = &arg[2];
             }
 
             if ( argletter == 'f' || strncmp(argname, "filestore", 9) == 0 ) {
                 if ( i+1 < argc ) {
                     size_t pathlen = 0;
                     size_t bytesparsed = 0;
+                    char* path = NULL;
                     step += 1;
                     path = argv[i+1];
                     pathlen = strlen(path);
 
                     bytesparsed = strlcpy(filestore, path, fslen);
-                    if ( bytesparsed >= fslen ) {
+                    if ( bytesparsed >= pathlen ) {
                         printf("filestore: invalid parameter");
                         validargs = 1;
                         break;
@@ -263,14 +266,15 @@ int argparse(char* filestore, const size_t fslen,
             else if ( argletter == 'i' || strncmp(argname, "clientid", 8) == 0 ) 
             {
                 if ( i+1 < argc ) {
-                    size_t pathlen = 0;
+                    size_t clientlen = 0;
                     size_t bytesparsed = 0;
+                    char* client = NULL;
                     step += 1;
                     client = argv[i+1];
-                    clientlen = strlen(path);
+                    clientlen = strlen(client);
 
                     bytesparsed = strlcpy(clientid, clientid, clidlen);
-                    if ( bytesparsed >= clidlen ) {
+                    if ( bytesparsed >= clientlen ) {
                         printf("clientid: invalid parameter");
                         validargs = 1;
                         break;
@@ -287,9 +291,10 @@ int argparse(char* filestore, const size_t fslen,
                 if ( i+1 < argc ) {
                     size_t pathlen = 0;
                     size_t bytesparsed = 0;
+                    char* brokerp = NULL;
                     step += 1;
                     brokerp = argv[i+1];
-                    brokerplen = strlen(path);
+                    brokerplen = strlen(brokerp);
 
                     bytesparsed = strlcpy(broker, brokerp, brokerplen);
                     if ( bytesparsed >= brokerplen ) {
@@ -304,13 +309,13 @@ int argparse(char* filestore, const size_t fslen,
                     break;
                 }
             }
+            else if ( argletter == 'h' || strncmp(argname, "help", 4) == 0) {
+                *help = 1;
+            }
             else {
                 printf("argparse: unknown argument %s\n", arg);
                 validargs = 1;
                 break;
-            }
-            else if ( argletter == 'h' || strncmp(argname, "help", 4) == 0) {
-                *help = 1;
             }
             
         } 
@@ -324,6 +329,8 @@ int argparse(char* filestore, const size_t fslen,
 
         i += step;
     }
+
+    return validargs;
 }
 
 
@@ -354,11 +361,7 @@ int main(int argc, char** argv) {
     }
 
     if ( strlen(clientid) == 0 || strlen(broker) == 0 ) {
-        printf("Client ID/broker not set, pass 
-    -clientid <clientid>
-    -broker <broker>
-
-See --help for more info.");
+        printf("Client ID/broker not set, pass --help for more info.\n");
         return 2;
     }
 

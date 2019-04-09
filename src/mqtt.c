@@ -77,8 +77,8 @@ int mqtt_msg_publish(MQTTClient client,
 
 // message received callback
 
-int mqtt_msg_recvd(void *context, char *topicName,
-    int topicLen, MQTTClient_message *message)
+int mqtt_msg_recvd(void *context, char *topicName, int topicLen, 
+                   MQTTClient_message *message)
 {
     int r = 0;
     size_t len = 0;
