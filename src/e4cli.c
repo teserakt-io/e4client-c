@@ -49,12 +49,18 @@ const char version[] = "E4CLI E4 Command Line Client C Version X.Y.Z (...)"
 "";
 
 
+// TODO: unglobal this.
+e4client client;
+
 void printhelp() {
     printf("%s\n", cli_commands);
 }
 
 void client_setid(const char* arg) {
-    /* IDs do not support spaces */
+
+}
+
+void client_setalias(const char* arg) {
 
 }
 
@@ -168,6 +174,8 @@ void repl() {
 
         if (strcmp(command, "setid") == 0) { 
             client_setid(arg);
+        if (strcmp(command, "setalias") == 0) { 
+            client_setid(arg);
         } else if (strcmp(command, "setkey") == 0) {
             client_setkey(arg);
         } else if (strcmp(command, "setpwd") == 0) {
@@ -211,18 +219,17 @@ void repl() {
     }
 }
 
-
-
-
-
+enum idtype { UNKNOWN, ID, ALIAS };
 
 int argparse(char* filestore, const size_t fslen, 
               char* broker, const size_t brokerlen,
-              char* clientid,  const size_t clidlen, 
+              char* clientx,  const size_t clidlen, 
+              enum idtype* idtype,
               int* help, int argc, char** argv) {
 
 
     int validargs = 0;
+    int clientset = 0;
     int i = 1, j = 0;
     while ( i < argc ) {
         int step=1;
@@ -273,9 +280,43 @@ int argparse(char* filestore, const size_t fslen,
                     client = argv[i+1];
                     clientlen = strlen(client);
 
-                    bytesparsed = strlcpy(clientid, clientid, clidlen);
+                    bytesparsed = strlcpy(clientidx, client, clidlen);
                     if ( bytesparsed >= clientlen ) {
                         printf("clientid: invalid parameter");
+                        validargs = 1;
+                        break;
+                    }
+                    if ( clientset == 1 ) {
+                        printf("clientid: clientalias already passed");
+                        validargs = 1;
+                        break;
+                    }
+                    clientset = 1;
+                }
+                else {
+                    printf("clientid: no filename specified");
+                    validargs = 1;
+                    break;
+                }
+            } 
+            else if ( argletter == 'a' || strncmp(argname, "clientalias", 8) == 0 ) 
+            {
+                if ( i+1 < argc ) {
+                    size_t clientlen = 0;
+                    size_t bytesparsed = 0;
+                    char* client = NULL;
+                    step += 1;
+                    client = argv[i+1];
+                    clientlen = strlen(client);
+
+                    bytesparsed = strlcpy(clientx, clientid, clidlen);
+                    if ( bytesparsed >= clientlen ) {
+                        printf("clientid: invalid parameter");
+                        validargs = 1;
+                        break;
+                    }
+                    if ( clientset == 1 ) {
+                        printf("clientid: clientalias already passed");
                         validargs = 1;
                         break;
                     }
@@ -339,17 +380,19 @@ int main(int argc, char** argv) {
 
     MQTTClient mqttClient;
     char filestore[256];
-    char clientid[256];
+    char client[256];
     char broker[256];
     char e4cmdtopic[256];
     int helpflag = 0;
+    enum idtype idtype = UNKNOWN;
 
     memset(filestore, 0, sizeof(filestore));
-    memset(clientid, 0, sizeof(clientid));
+    memset(client, 0, sizeof(client));
     memset(broker, 0, sizeof(broker));
 
     if ( argparse(filestore, sizeof(filestore), 
                   clientid, sizeof(clientid),
+                  &idtype,
                   &helpflag, argc, argv) != 0 ) {
         printf("Invalid command line arguments, exiting.\n");
         return 1;
@@ -360,15 +403,24 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    if ( strlen(clientid) == 0 || strlen(broker) == 0 ) {
-        printf("Client ID/broker not set, pass --help for more info.\n");
-        return 2;
-    }
+    /* now we have parsed the arguments, we need to decide what to do. Our 
+     * options are:
+     * 1. A filepath was passed. If this is the case we can load the 
+     * clientid and key material directly from storage.
+     * 2. A filepath was not passed. Everything must be loaded from the 
+     * command line
+     *
+     * In a real device, storage would be pre-populated (it does not have 
+     * to comply with the e4storage definition given in the c library - 
+     * any storage that implements this interface is suitable).
+     */
+
 
     /* from here, we are NOT running in help mode and do have a clientid 
      * and broker, albeit possibly not valid */
-
     
+
+    mqtt_init(client.Client, broker);    
     
     return 0;
 }

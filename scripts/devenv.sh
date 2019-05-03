@@ -16,6 +16,7 @@
 ## -- -- ...
 
 E4LIBPARENT="$(dirname $PWD)"
-E4LIBDIR="$E4LIBPARENT/lib-c/"
+export E4LIBDIR="$E4LIBPARENT/lib-c/"
 
 echo "E4LIBDIR=$E4LIBDIR"
+

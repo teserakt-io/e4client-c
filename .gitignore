@@ -52,3 +52,5 @@ Mkfile.old
 dkms.conf
 
 paho.mqtt.c/*
+
+.vscode/*
