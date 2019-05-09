@@ -56,15 +56,15 @@ void printhelp() {
     printf("%s\n", cli_commands);
 }
 
-void client_setid(const char* arg) {
+void client_setid(e4client* client, const char* arg) {
 
 }
 
-void client_setalias(const char* arg) {
+void client_setalias(e4client* client, const char* arg) {
 
 }
 
-void client_setkey(const char* arg) {
+void client_setkey(e4client* client, const char* arg) {
 
 }
 
@@ -415,6 +415,37 @@ int main(int argc, char** argv) {
      * any storage that implements this interface is suitable).
      */
 
+    e4c_init(&e4client.store);
+
+    // filepath not passed. This is fine, let's decode what we can.
+    if ( strlen(filepath) == 0 ) {
+        
+        switch (idtype) {
+        case idtype::ID:
+            {
+            if ( strlen(client) != 2*E4_ID_LEN) {
+                printf("Invalid Client ID Length.\n");
+                return 1;
+            }
+            // TODO:decode hex to bytes.
+            }
+        case idtype::ALIAS:
+            {
+            
+            }
+        default:
+            // This codepath should be unreachable.
+        }
+    } 
+    else
+    {
+        // we _do_ have a filepath. let's try to sync data from it.
+        
+        if (e4c_load(&e4client.store, filepath) != 0 {
+            printf("Unable to load data from %s.\n", filepath);
+            return 1;
+        }
+    }
 
     /* from here, we are NOT running in help mode and do have a clientid 
      * and broker, albeit possibly not valid */

@@ -4,6 +4,7 @@
 
 typedef struct _e4client_tag {
     MQTTClient Client;
+    e4storage store;
 } e4client;
 
 #endif
