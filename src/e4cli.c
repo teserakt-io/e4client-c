@@ -58,10 +58,33 @@ void printhelp() {
 
 void client_setid(e4client* client, const char* arg) {
 
+    uint8_t id[E4_ID_LEN];
+    size_t arglen = strlen(arg);
+    int result = 0;
+
+    memset(id, 0, sizeof id);
+
+    if ( arglen == 0 || arglen != E4_ID_LEN*2 ) {
+        printf("Expected client ID of length %d, not received.\n", E4_ID_LEN*2);
+        return;
+    }
+
+    r = e4c_hex_decode(id, sizeof(id), arg, arglen);     
+    if ( r == 0 ) {
+        printf("Unable to decode ID: invalid data.\n");
+        return;
+    }
+
+    client->store.e4c_set_id(client->store, id);
+    return;
 }
 
 void client_setalias(e4client* client, const char* arg) {
+    
+    char id[E4_ID_LEN] = {0};
 
+    
+    e4c_derive_clientid(id, sizeof id, arg, arglen);
 }
 
 void client_setkey(e4client* client, const char* arg) {
