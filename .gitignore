@@ -54,3 +54,4 @@ dkms.conf
 paho.mqtt.c/*
 
 .vscode/*
+e4clic
