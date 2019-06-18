@@ -11,6 +11,8 @@ These are items that should be done as fast as possible.
      1. AVR
      1. ARM D11 board + ethernet shield.
      1. STM32 dev board + ethernet shield.
+ 1. When investigating demonstrator support, what do we need to do to support 
+    MQTT using ethernet?
 
 ## Wishlist backlog
 
