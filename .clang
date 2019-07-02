@@ -1,2 +1,1 @@
--I../lib-c/include/
--I./src/
+flags = -I$(pwd)/../libe4/include/ -Wall -Werror -std=c99

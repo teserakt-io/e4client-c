@@ -24,8 +24,11 @@ BIN     = $(BINDIR)/e4cli
 LIB	= $(LIBDIR)/$(LIBNAME).a
 DISTDIR	= dist
 
-OBJS    = $(OBJDIR)/e4cli.o                  \
-          $(OBJDIR)/mqtt.o         #\
+OBJS    = $(OBJDIR)/commands.o      \
+          $(OBJDIR)/repl.o          \
+          $(OBJDIR)/recv.o          \
+          $(OBJDIR)/mqtt.o          \
+          $(OBJDIR)/e4cli.o
 
 default: setup $(BIN)
 
@@ -48,3 +51,6 @@ clean:
 dist: $(BIN)
 	@echo 'Making $(DISTDIR)/$(LIBNAME)-$(NOW)-$(GITCOMMIT).tar.bz2'
 	tar cfvj $(DISTDIR)/$(LIBNAME)-$(NOW)-$(GITCOMMIT).tar.bz2 $(LIBDIR)/* $(INCDIR)/*
+
+format:
+	clang-format -i src/*.c src/*.h
