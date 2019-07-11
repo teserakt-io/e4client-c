@@ -313,8 +313,40 @@ int main(int argc, char **argv)
     /* from here, we are NOT running in help mode and do have a clientid
      * and broker, albeit possibly not valid */
 
+    /* let's set up the broer */
+    mqtt_init(&client, broker);
 
-    mqtt_init(client.Client, broker);
-
+    /* and now we can run the repl: */
+    repl(&client);
     return 0;
+}
+
+
+void dump_hex(const void *data, size_t len)
+{
+    size_t i, j;
+    uint8_t ch;
+
+    for (i = 0; i < len; i += 16) {
+
+        printf("%03X ", (int) i);
+
+        for (j = 0; j < 16; j++) {
+            if (i + j >= len) {
+                putchar(' ');
+            } else {
+                ch = ((const uint8_t *) data)[i + j];
+                if (ch >= 32 && ch < 127)
+                    putchar(ch);
+                else
+                    putchar('.');
+            }
+        }
+        printf("  ");
+        for (j = i; j < i + 16 && j < len; j++) {
+            ch = ((const uint8_t *) data)[j];
+            printf(" %02X", ch);
+        }
+        printf("\n");
+    }
 }

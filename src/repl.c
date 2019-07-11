@@ -23,7 +23,7 @@
 #include "e4cli.h"
 #include "mqtt.h"
 
-void repl()
+void repl(e4client* client)
 {
 
     char line[256] = { 0 };
@@ -83,54 +83,54 @@ void repl()
 
         if (strcmp(command, "setid") == 0)
         {
-            client_setid(arg);
+            client_setid(client, arg);
             if (strcmp(command, "setalias") == 0)
             {
-                client_setid(arg);
+                client_setid(client, arg);
             }
             else if (strcmp(command, "setkey") == 0)
             {
-                client_setkey(arg);
+                client_setkey(client, arg);
             }
             else if (strcmp(command, "setpwd") == 0)
             {
-                client_setpwd(arg);
+                client_setpwd(client, arg);
             }
             else if (strcmp(command, "genkey") == 0)
             {
-                client_genkey(arg);
+                client_genkey(client, arg);
             }
             else if (strcmp(command, "settopickey") == 0)
             {
-                client_settopickey(arg);
+                client_settopickey(client, arg);
             }
             else if (strcmp(command, "subscribe") == 0 || strcmp(command, "s") == 0)
             {
-                client_subscribe(arg);
+                client_subscribe(client, arg);
             }
             else if (strcmp(command, "unsubscribe") == 0 || strcmp(command, "u") == 0)
             {
-                client_unsubscribe(arg);
+                client_unsubscribe(client, arg);
             }
             else if (strcmp(command, "changetopic") == 0 || strcmp(command, "u") == 0)
             {
-                client_changetopic(arg);
+                client_changetopic(client, arg);
             }
             else if (strcmp(command, "e4msg") == 0 || strcmp(command, "e") == 0)
             {
-                client_e4msg(arg);
+                client_e4msg(client, arg);
             }
             else if (strcmp(command, "clearmsg") == 0 || strcmp(command, "m") == 0)
             {
-                client_clearmsg(arg);
+                client_clearmsg(client, arg);
             }
             else if (strcmp(command, "list") == 0 || strcmp(command, "l") == 0)
             {
-                client_list(arg);
+                client_list(client, arg);
             }
             else if (strcmp(command, "zero") == 0 || strcmp(command, "z") == 0)
             {
-                client_zero(arg);
+                client_zero(client, arg);
             }
             else if (strcmp(command, "help") == 0 || strcmp(command, "h") == 0)
             {
@@ -145,10 +145,6 @@ void repl()
             }
         }
     }
+}
 
-    enum idtype
-    {
-        UNKNOWN,
-        ID,
-        ALIAS
-    };
+
