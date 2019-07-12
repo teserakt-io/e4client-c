@@ -23,7 +23,7 @@
 #include "e4cli.h"
 #include "mqtt.h"
 
-void repl(e4client* client)
+void repl(e4client *client)
 {
 
     char line[256] = { 0 };
@@ -146,5 +146,3 @@ void repl(e4client* client)
         }
     }
 }
-
-

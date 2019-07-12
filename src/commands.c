@@ -25,7 +25,7 @@ void client_setid(e4client *client, const char *arg)
         return;
     }
 
-    result = e4c_hex_decode((char*)id, sizeof(id), (char*)arg, arglen);
+    result = e4c_hex_decode((char *)id, sizeof(id), (char *)arg, arglen);
     if (result == 0)
     {
         printf("Unable to decode ID: invalid data.\n");
@@ -36,7 +36,7 @@ void client_setid(e4client *client, const char *arg)
     return;
 }
 
-void client_genkey(e4client* client, const char *arg)
+void client_genkey(e4client *client, const char *arg)
 {
 
     // do not generate but ask the C2 to do it?
@@ -68,14 +68,14 @@ void client_setkey(e4client *client, const char *arg)
         printf("ERROR: key length must be %d characters, encoded in hex.\n", E4_KEY_LEN * 2);
         return;
     }
-    e4c_hex_decode((char*)keybuffer, E4_KEY_LEN, arg, keylen);
+    e4c_hex_decode((char *)keybuffer, E4_KEY_LEN, arg, keylen);
     e4c_set_idkey(&client->store, keybuffer);
 }
 
-void client_settopickey(e4client* client, char *arg)
+void client_settopickey(e4client *client, char *arg)
 {
     char keybuffer[E4_KEY_LEN];
-    //char *topic = arg;
+    // char *topic = arg;
     char *key = arg;
 
     key = strchr(arg, ' ');
@@ -104,18 +104,18 @@ void client_settopickey(e4client* client, char *arg)
     */
 }
 
-void client_setpwd(e4client* client, const char *arg)
+void client_setpwd(e4client *client, const char *arg)
 {
     printf("ERROR: The C client does not yet implement password-derivation.\n");
     printf("       Please use the setkey command.\n");
 }
 
 
-void client_subscribe(e4client* client, const char *arg)
+void client_subscribe(e4client *client, const char *arg)
 {
 
     size_t arglen = strlen(arg);
-    if (arglen == 0) 
+    if (arglen == 0)
     {
         printf("client_subscribe: Invalid topic");
         return;
@@ -125,7 +125,7 @@ void client_subscribe(e4client* client, const char *arg)
 }
 
 
-void client_unsubscribe(e4client* client, const char *arg)
+void client_unsubscribe(e4client *client, const char *arg)
 {
     size_t arglen = strlen(arg);
     if (arglen == 0)
@@ -137,11 +137,12 @@ void client_unsubscribe(e4client* client, const char *arg)
     MQTTClient_unsubscribe(client->mqttclient, arg);
 }
 
-void client_changetopic(e4client* client, const char *arg) {}
+void client_changetopic(e4client *client, const char *arg) {}
 
-void client_e4msg(e4client* client, const char *arg) {}
+void client_e4msg(e4client *client, const char *arg) {}
 
-void client_clearmsg(e4client* client, char *arg) {
+void client_clearmsg(e4client *client, char *arg)
+{
 
     char *topic = arg;
     char *msg = arg;
@@ -161,14 +162,9 @@ void client_clearmsg(e4client* client, char *arg) {
 
     size_t msglen = strlen(msg);
 
-    mqtt_msg_publish(client->mqttclient, 
-            (uint8_t*) msg, 
-            msglen, 
-            (const char*) topic);
+    mqtt_msg_publish(client->mqttclient, (uint8_t *)msg, msglen, (const char *)topic);
 }
 
-void client_list(e4client* client, const char *arg) {}
+void client_list(e4client *client, const char *arg) {}
 
-void client_zero(e4client* client, const char *arg) {}
-
-
+void client_zero(e4client *client, const char *arg) {}

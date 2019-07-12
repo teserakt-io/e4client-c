@@ -17,22 +17,42 @@
 /* Use the file storage command */
 #define E4_STORE_FILE
 #include "e4/e4.h"
+#include "e4/util.h"
 #include "e4cli.h"
 
-void mqtt_init(e4client* client, const char *broker)
+int mqtt_init(e4client *client, const char *broker)
 {
+    char clientid[E4_CTRLTOPIC_LEN];
 
     MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
     conn_opts.keepAliveInterval = 20;
     conn_opts.cleansession = 1;
 
-    MQTTClient_setCallbacks(client->mqttclient, (void*)client, mqtt_conn_lost, mqtt_msg_recvd, mqtt_msg_delivery);
-    MQTTClient_create(client->mqttclient, broker, clientid, MQTTCLIENT_PERSISTENCE_NONE, NULL);
+    e4c_derive_control_topic(clientid, E4_CTRLTOPIC_LEN, (const uint8_t *)client->clientid);
+
+    MQTTClient_setCallbacks(client->mqttclient, (void *)client, mqtt_conn_lost,
+                            mqtt_msg_recvd, mqtt_msg_delivery);
+    MQTTClient_create(client->mqttclient, broker, clientid,
+                      MQTTCLIENT_PERSISTENCE_NONE, NULL);
+
+    if (MQTTClient_connect(client->mqttclient, &conn_opts) != MQTTCLIENT_SUCCESS)
+    {
+        printf("!!! Failed to connect.\n");
+        return 1;
+    }
+
+    return 0;
+}
+
+void mqtt_deinit(e4client *client)
+{
+    MQTTClient_disconnect(client->mqttclient, 10000);
+    MQTTClient_destroy(&client->mqttclient);
 }
 
 void mqtt_msg_delivery(void *context, MQTTClient_deliveryToken dt)
 {
-    e4client* client = (e4client*) context;
+    e4client *client = (e4client *)context;
     client->deliveredtoken = dt;
 }
 
@@ -41,7 +61,7 @@ void mqtt_conn_lost(void *context, char *cause)
     printf("\nConnection lost: %s\n", cause);
 }
 
-int mqtt_msg_publish(e4client* client, const uint8_t *payload, size_t len, const char *topic)
+int mqtt_msg_publish(e4client *client, const uint8_t *payload, size_t len, const char *topic)
 {
     MQTTClient_message pubmsg = MQTTClient_message_initializer;
     MQTTClient_deliveryToken token;
@@ -50,11 +70,12 @@ int mqtt_msg_publish(e4client* client, const uint8_t *payload, size_t len, const
     size_t blen = 0;
     uint8_t buf[1024];
 
-    pubmsg.qos = CLIC_QOS;
+    pubmsg.qos = 0; // CLIC_QOS;
     pubmsg.retained = 0;
     client->deliveredtoken = 0;
 
-    r = e4c_protect_message(buf, sizeof(buf), &blen, payload, len, topic, &client->store);
+    r =
+    e4c_protect_message(buf, sizeof(buf), &blen, payload, len, topic, &client->store);
 
     if (r == 0)
     {
@@ -83,7 +104,7 @@ int mqtt_msg_publish(e4client* client, const uint8_t *payload, size_t len, const
 
 int mqtt_msg_recvd(void *context, char *topicName, int topicLen, MQTTClient_message *message)
 {
-    e4client* client = (e4client*) context;
+    e4client *client = (e4client *)context;
     // Pass the message into a receive function that can be used with
     // any protocol
     recv_message(client, topicName, message->payload, message->payloadlen);
@@ -92,5 +113,6 @@ int mqtt_msg_recvd(void *context, char *topicName, int topicLen, MQTTClient_mess
     MQTTClient_free(topicName);
     return 1;
 }
+
 
 // e4clic main()

@@ -6,7 +6,7 @@ CC	    = gcc
 AR          = ar
 ARFLAGS     = rcs
 CFLAGS	    = -Wall -Werror -Ofast
-LDFLAGS	    = -L. -Llibs/libpaho-mqtt3c.a -L$(E4LIBDIR)/libe4.a 
+LDFLAGS	    = -L. -lc -lpthread 
 INCLUDES    = -Iinclude -I$(E4LIBDIR)/include -Isrc/crypto -Ipaho.mqtt.c/src
 
 
@@ -15,7 +15,7 @@ GITCOMMIT=$(shell git rev-list -1 HEAD)
 NOW=$(shell date "+%Y%m%d%H%M")
 
 # OBJ paths match their src folder equivalents
-INCDIR = include
+INCDIR  = include
 OBJDIR  = build
 SRCDIR  = src
 LIBDIR  = lib
@@ -23,6 +23,8 @@ BINDIR  = bin
 BIN     = $(BINDIR)/e4cli
 LIB	= $(LIBDIR)/$(LIBNAME).a
 DISTDIR	= dist
+
+LIBS    = libpaho-mqtt3c.a $(E4LIBDIR)/lib/libe4.a 
 
 OBJS    = $(OBJDIR)/commands.o      \
           $(OBJDIR)/repl.o          \
@@ -38,8 +40,8 @@ setup:
 	mkdir -p $(DISTDIR); \
 
 $(BIN): $(OBJS)
-	mkdir -p bin; \
-	$(GCC) $(LDFLAGS) -o $(BIN) $(OBJS)
+	mkdir -p bin;
+	$(CC) $(LDFLAGS) -o $(BIN) $(OBJS) $(LIBS)
 
 build/%.o: src/%.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
