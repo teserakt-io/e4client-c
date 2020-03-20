@@ -266,15 +266,15 @@ int main(int argc, char **argv)
              int argc,
              char **argv)
     */
-    if (argparse(filestore, 
-                 sizeof(filestore), 
+    if (argparse(filestore,
+                 sizeof(filestore),
                  broker,
                  sizeof(broker),
-                 clientid, 
+                 clientid,
                  sizeof(clientid),
-                 &idtype, 
-                 &helpflag, 
-                 argc, 
+                 &idtype,
+                 &helpflag,
+                 argc,
                  argv) != 0)
     {
         printf("Invalid command line arguments. Call with --help for more.\n");

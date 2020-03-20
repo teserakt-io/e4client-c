@@ -2,7 +2,6 @@
 #include "MQTTClient.h"
 
 /* Use the file storage command */
-#define E4_STORE_FILE
 #include "e4/e4.h"
 #include "e4/strlcpy.h"
 #include "e4/util.h"
